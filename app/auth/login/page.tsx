@@ -1,49 +1,64 @@
-"use client"
+"use client";
 
-import type React from "react"
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Logo } from "@/components/logo"
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Logo } from "@/components/logo";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const { login, isLoading } = useAuth()
-  const router = useRouter()
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      await login(username, password)
-    } catch (error) {
-      console.error("Login error:", error)
-    }
-  }
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
 
-  const handleQuickLogin = async (role: string) => {
-    try {
-      await login(role, "password")
-    } catch (error) {
-      console.error("Quick login error:", error)
+    const result = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      toast.error("Invalid username or password");
+    } else {
+      toast.success("Login successful!");
+      router.push("/dashboard"); // change this to your desired post-login route
     }
-  }
+
+    setIsLoading(false);
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-blue-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md shadow-lg border-blue-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-blue-50/30 dark:bg-gray-900/20 p-4">
+      <Card className="w-full max-w-md border-blue-100 dark:border-gray-700">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <Logo className="h-12 w-auto" />
+            <Logo />
           </div>
-          <CardTitle className="text-2xl font-bold">Login to Hayoma Dairy</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            Login to Hayoma Dairy
+          </CardTitle>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -52,86 +67,86 @@ export default function LoginPage() {
               <Input
                 id="username"
                 type="text"
-                placeholder="your.username"
+                placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                >
                   Forgot password?
                 </Link>
               </div>
               <Input
                 id="password"
                 type="password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={isLoading}
+            >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300 dark:border-gray-600" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">
-                  Quick Access (For Testing)
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <Button
-                variant="outline"
-                onClick={() => handleQuickLogin("admin")}
-                className="border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:hover:bg-blue-950"
-              >
-                Admin Login
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleQuickLogin("shop")}
-                className="border-green-200 hover:bg-green-50 dark:border-green-900 dark:hover:bg-green-950"
-              >
-                Shop Login
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleQuickLogin("supplier")}
-                className="border-amber-200 hover:bg-amber-50 dark:border-amber-900 dark:hover:bg-amber-950"
-              >
-                Supplier Login
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleQuickLogin("driver")}
-                className="border-purple-200 hover:bg-purple-50 dark:border-purple-900 dark:hover:bg-purple-950"
-              >
-                Driver Login
-              </Button>
+          <div className="mt-4 text-center text-sm">
+            <p className="text-muted-foreground">Demo Accounts:</p>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {[
+                { role: "Admin", user: "admin" },
+                { role: "Shop", user: "shop" },
+                { role: "Supplier", user: "supplier" },
+                { role: "Driver", user: "driver" },
+              ].map((acc) => (
+                <div
+                  key={acc.user}
+                  className="text-left p-2 bg-blue-50 dark:bg-gray-800 rounded"
+                >
+                  <p>
+                    <strong>{acc.role}:</strong> {acc.user}
+                  </p>
+                  <p>
+                    <strong>Password:</strong> password
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            Don&apos;t have an account?{" "}
-            <Link href="/contact" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-              Contact us
-            </Link>{" "}
-            to get started.
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-center text-sm text-muted-foreground">
+            <p>
+              By continuing, you agree to our{" "}
+              <Link
+                href="#"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="#"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </div>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
