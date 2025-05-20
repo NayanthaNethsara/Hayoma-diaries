@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   // "admin", "shop", "supplier", "driver"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Inventory {
+  id          String   @id @default(cuid())
+  name        String
+  quantity    Int
+  unit        String
+  category    String
+  threshold   Int
+  supplier    String
+  lastUpdated String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  unit        String
+  category    String
+  description String
+  image       String?
+  inStock     Boolean  @default(true)
+  supplier    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Shop {
+  id           String   @id @default(cuid())
+  name         String
+  address      String
+  phone        String
+  email        String
+  contactPerson String
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Supplier {
+  id           String   @id @default(cuid())
+  name         String
+  address      String
+  phone        String
+  email        String
+  contactPerson String
+  category     String
+  isActive     Boolean  @default(true)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  shopId        String
+  shopName      String
+  date          String
+  status        String       // "PENDING", "APPROVED", "SHIPPED", "DELIVERED", "CANCELLED"
+  total         Float
+  paymentStatus String       // "PAID", "UNPAID"
+  deliveryDate  String?
+  items         OrderItem[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  productName String
+  quantity    Int
+  price       Float
+  subtotal    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
