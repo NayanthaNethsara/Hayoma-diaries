@@ -1,17 +1,14 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/contexts/auth-context";
-import { useSidebarState } from "@/hooks/use-sidebar-state";
 import { Logo } from "@/components/logo";
+import { signOut } from "next-auth/react"; // import signOut
 import {
   BarChart3,
   Box,
@@ -39,15 +36,16 @@ interface NavItem {
 }
 
 export function DashboardSidebar() {
-  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
-  const sidebarState = useSidebarState();
-  const isCollapsed = sidebarState.isCollapsed ?? false;
-  // Removed toggle assignment as 'toggle' does not exist on SidebarContextType
   const [isSheetCollapsed, setIsSheetCollapsed] = useState(false);
 
-  // Check if mobile on mount
+  // Replace this with your actual user retrieval logic (context/session)
+  // For example, you might use: const { user } = useAuth();
+  const user = { role: "admin" }; // <-- dummy user, replace accordingly
+  const role = user?.role?.toLowerCase() ?? "";
+
+  // Detect mobile view
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -56,8 +54,6 @@ export function DashboardSidebar() {
     window.addEventListener("resize", checkIfMobile);
     return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
-
-  const role = user?.role?.toLowerCase() || "";
 
   const navItems: NavItem[] = [
     {
@@ -231,7 +227,7 @@ export function DashboardSidebar() {
         <Button
           variant="outline"
           className="w-full justify-start gap-2"
-          onClick={logout}
+          onClick={() => signOut()}
         >
           <LogOut className="h-4 w-4" />
           Log out
@@ -240,7 +236,6 @@ export function DashboardSidebar() {
     </div>
   );
 
-  // For mobile
   if (isMobile) {
     return (
       <>
@@ -265,18 +260,18 @@ export function DashboardSidebar() {
     );
   }
 
-  // For desktop
   return (
     <>
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-20 flex w-64 flex-col border-r bg-background transition-transform",
-          isCollapsed ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isSheetCollapsed
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
         )}
       >
         <SidebarContent />
       </aside>
-      {/* Removed toggle button as 'toggle' does not exist on SidebarContextType */}
     </>
   );
 }

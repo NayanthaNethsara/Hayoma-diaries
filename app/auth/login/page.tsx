@@ -40,7 +40,7 @@ export default function LoginPage() {
       toast.error("Invalid username or password");
     } else {
       toast.success("Login successful!");
-      router.push("/dashboard"); // change this to your desired post-login route
+      router.push("/login"); // change this to your desired post-login route
     }
 
     setIsLoading(false);

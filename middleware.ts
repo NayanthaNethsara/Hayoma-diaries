@@ -1,17 +1,44 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export function middleware(request: NextRequest) {
-  try {
-    // For demo purposes, we're bypassing authentication
-    // In a real app, you would check for authentication here
-    return NextResponse.next();
-  } catch (error) {
-    console.error("Middleware error:", error);
-    // If there's an error, still allow the request to proceed
-    // This prevents blocking the UI due to auth errors
-    return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const publicPaths = ["/login", "/register", "/about"];
+  const isPublicPath = publicPaths.includes(pathname);
+
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  const isTokenExpired = token?.exp
+    ? Date.now() >= Number(token.exp) * 1000
+    : true;
+
+  const userRole = token?.role;
+
+  if (!isPublicPath && (!token || isTokenExpired)) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  // If authenticated and trying to access login or register
+  if (isPublicPath && token && !isTokenExpired) {
+    let redirectPath = "/dashboard";
+
+    if (userRole === "ADMIN") {
+      redirectPath = "/dashboard/admin";
+    } else if (userRole === "DRIVER") {
+      redirectPath = "/dashboard/driver";
+    } else if (userRole === "SHOP") {
+      redirectPath = "/dashboard/shop";
+    }
+
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
