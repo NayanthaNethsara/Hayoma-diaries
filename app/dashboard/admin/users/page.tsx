@@ -55,7 +55,7 @@ const mockUsers = [
   {
     id: "1",
     username: "admin",
-    name: "John Admin",
+    name: "Admin",
     email: "admin@hayoma.com",
     role: "admin",
     isActive: true,
@@ -64,7 +64,7 @@ const mockUsers = [
   {
     id: "2",
     username: "shop1",
-    name: "Sarah Shop",
+    name: " Shop",
     email: "shop@hayoma.com",
     role: "shop",
     isActive: true,
@@ -73,7 +73,7 @@ const mockUsers = [
   {
     id: "3",
     username: "supplier1",
-    name: "Mike Supplier",
+    name: " Supplier",
     email: "supplier@hayoma.com",
     role: "supplier",
     isActive: true,
@@ -82,7 +82,7 @@ const mockUsers = [
   {
     id: "4",
     username: "driver1",
-    name: "Dave Driver",
+    name: " Driver",
     email: "driver@hayoma.com",
     role: "driver",
     isActive: true,
@@ -100,7 +100,7 @@ const mockUsers = [
   {
     id: "6",
     username: "shop2",
-    name: "Tom Shop",
+    name: "Shop",
     email: "tom@hayoma.com",
     role: "shop",
     isActive: true,

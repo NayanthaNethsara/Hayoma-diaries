@@ -532,7 +532,7 @@ export default function OrdersPage() {
               </TableRow>
             ) : (
               filteredOrders.map((order) => (
-                <TableRow key={order.id} className="bg-white">
+                <TableRow key={order.id} className="">
                   <TableCell className="font-medium">{order.orderId}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>${order.total.toFixed(2)}</TableCell>
