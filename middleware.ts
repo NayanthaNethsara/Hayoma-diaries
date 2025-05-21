@@ -33,6 +33,8 @@ export async function middleware(request: NextRequest) {
       redirectPath = "/dashboard/driver";
     } else if (userRole === "SHOP") {
       redirectPath = "/dashboard/shop";
+    } else if (userRole === "SUPPLIER") {
+      redirectPath = "/dashboard/supplier";
     }
 
     return NextResponse.redirect(new URL(redirectPath, request.url));
